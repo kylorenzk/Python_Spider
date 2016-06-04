@@ -12,9 +12,9 @@ sys.setdefaultencoding('utf8')
 file_name = "IOSyouxicz.txt"
 file_content = ""
 
-gamelist = open("game_url_list.txt", "r").readlines()
+gamelist = open("game_url_list.txt", "r").readlines()   #读取每个类别的链接
 
-for c in gamelist:
+for c in gamelist:     #遍历每一个APPLESTORE游戏类别的链接
     c = c.strip("\n")
     headers = {
         "Host":"itunes.apple.com",
@@ -25,9 +25,9 @@ for c in gamelist:
     plain_txt = source_code.text
     soup = BeautifulSoup(plain_txt)
     column = ["column first","column", "column last"]
-    for i in column:
+    for i in column:  #遍历每一个竖标签的游戏
         game_info = soup.find("div",{"class" :i}).findAll("li")
-        for x in game_info:
+        for x in game_info:   #遍历每一个游戏链接
             url_new = x.find("a")["href"]
             game_name = x.find("a").string
             file_content += "\n" + game_name + "\n"
