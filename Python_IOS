@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+import requests, time
+from BeautifulSoup import BeautifulSoup
+import sys
+stdi,stdo,stde=sys.stdin,sys.stdout,sys.stderr
+reload(sys)
+sys.stdin,sys.stdout,sys.stderr=stdi,stdo,stde
+sys.setdefaultencoding('utf8')
+
+file_name = "IOSyouxicz.txt"
+file_content = ""
+
+gamelist = open("game_url_list.txt", "r").readlines()
+
+for c in gamelist:
+    c = c.strip("\n")
+    headers = {
+        "Host":"itunes.apple.com",
+        "Referer":c,
+        "User-Agent":"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36"
+        }
+    source_code = requests.get(c, headers = headers)
+    plain_txt = source_code.text
+    soup = BeautifulSoup(plain_txt)
+    column = ["column first","column", "column last"]
+    for i in column:
+        game_info = soup.find("div",{"class" :i}).findAll("li")
+        for x in game_info:
+            url_new = x.find("a")["href"]
+            game_name = x.find("a").string
+            file_content += "\n" + game_name + "\n"
+            try:
+                soup_new = BeautifulSoup(requests.get(url_new, headers = headers).text)
+                priceAll = soup_new.find("ol", {"class":"list"}).findAll("li")
+                for j in priceAll:
+                    price_content = j.find("span",{"class":"in-app-title"}).string
+                    price = j.find("span",{"class":"in-app-price"}).string
+                    file_content += price_content + "\t" + price + "\n"
+            except:
+                file_content += "can't not open the url" + "\n"
+ 
+f = open(file_name, "w")
+f.write(file_content)
+f.close()
